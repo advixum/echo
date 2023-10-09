@@ -15,14 +15,17 @@ async def handle_echo(
     - writer (StreamWriter): Объект для записи данных в исходящее
     сетевое соединение. 
     """
-    data = await reader.read(1024)
-    message = data.decode()
-    addr = writer.get_extra_info('peername')
-    print(f"Received: {message} from {addr[0]}:{addr[1]}")
-    mod_message = message.upper()
-    writer.write(mod_message.encode())
-    await writer.drain()
-    print(f"Sent: {mod_message} to {addr[0]}:{addr[1]}")
+    while True:
+        data = await reader.read(1024)
+        if not data:
+            break
+        message = data.decode()
+        addr = writer.get_extra_info('peername')
+        print(f"Received: {message} from {addr[0]}:{addr[1]}")
+        mod_message = message.upper()
+        writer.write(mod_message.encode())
+        await writer.drain()
+        print(f"Sent: {mod_message} to {addr[0]}:{addr[1]}")
     writer.close()
 
 loop = asyncio.get_event_loop()
